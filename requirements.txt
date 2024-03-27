@@ -1,0 +1,14 @@
+torch
+torchvision
+tensorboard
+tqdm
+numpy
+scipy
+scikit-learn
+simpy
+nose
+pandas
+matplotlib
+pillow
+opencv-contrib-python
+

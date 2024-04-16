@@ -18,6 +18,12 @@ def update_param_stats(param_stats, new_stats):
 		param_stats[n + '.nrm'].append(torch.sum(s ** 2).item())
 	return param_stats
 
+def update_param_dist(param_stats, new_stats):
+	for n, s in new_stats.items():
+		param_stats[n + '.dist'] = s.reshape(-1).tolist()
+		param_stats[n + '.nrm_dist'] = (torch.sum(s ** 2, dim=list(range(1, s.ndim))) if s.ndim > 1 else s**2).reshape(-1).tolist()
+	return param_stats
+
 # Save data to csv file
 def update_csv(results, path):
 	os.makedirs(os.path.dirname(path), exist_ok=True)
@@ -42,7 +48,7 @@ def save_plot(data_dicts, path, xlabel='step', ylabel='result'):
 	plt.close(fig)
 
 # Save a grid of figures showing time series plots in the specified file
-def save_grid_plot(data_dicts, path, rows=8, cols=8, xlabel='step', ylabel='result'):
+def save_grid_plot(data_dicts, path, rows=8, cols=8, xlabel='value', ylabel='count'):
 	fig, graphs = plt.subplots(rows, cols, figsize=(48, 12))
 	i, j = 0, 0
 	for key, data_dict in data_dicts.items():
@@ -50,6 +56,25 @@ def save_grid_plot(data_dicts, path, rows=8, cols=8, xlabel='step', ylabel='resu
 		graph.plot(list(data_dict.keys()) if isinstance(data_dict, dict) else range(1, len(data_dict) + 1),
 		           list(data_dict.values()) if isinstance(data_dict, dict) else data_dict,
 		           label=str(key))
+		graph.set_xlabel(xlabel)
+		graph.set_ylabel(ylabel)
+		graph.grid(True)
+		graph.legend()
+		i += 1
+		if i == rows:
+			i = 0
+			j += 1
+	os.makedirs(os.path.dirname(path), exist_ok=True)
+	fig.savefig(path, bbox_inches='tight')
+	plt.close(fig)
+	
+# Save a grid of figures showing distribution plots in the specified file
+def save_grid_dist(data_dicts, path, rows=8, cols=8, bins=10, xlabel='step', ylabel='result'):
+	fig, graphs = plt.subplots(rows, cols, figsize=(48, 12), sharex='row')
+	i, j = 0, 0
+	for key, values in data_dicts.items():
+		graph = graphs[i][j]
+		graph.hist(list(values), bins=bins, label=str(key), edgecolor='black')
 		graph.set_xlabel(xlabel)
 		graph.set_ylabel(ylabel)
 		graph.grid(True)

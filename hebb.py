@@ -185,7 +185,7 @@ class HebbianConvTranspose2d(HebbianConv2d):
 	MODE_HPCA_T = 'hpca_t'
 
 	def __init__(self, in_channels, out_channels, kernel_size, stride=1, w_nrm=True, act=nn.Identity(),
-	             mode=MODE_SWTA_T, k=1, patchwise=False, contrast=1., uniformity=False, alpha=0.):
+	             mode=MODE_SWTA_T, k=1, patchwise=True, contrast=1., uniformity=False, alpha=0.):
 		"""
 		
 		:param out_channels: output channels of the convolutional kernel
